@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports — CodeAtlas</title>
+  <link rel="stylesheet" href="design-system.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    .reports-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); height: calc(100vh - var(--topbar-height) - 120px); }
+    .report-options { display: flex; flex-direction: column; gap: var(--space-6); }
+    .report-preview { background: var(--bg-deep); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .preview-toolbar { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-4); background: var(--bg); border-bottom: 1px solid var(--border); }
+    .preview-content { flex: 1; overflow-y: auto; padding: var(--space-6); }
+
+    .export-option { padding: var(--space-6); cursor: pointer; transition: all var(--duration-fast) var(--ease-out); }
+    .export-option:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+    .export-option.selected { border-color: var(--accent-blue); background: rgba(100, 140, 255, 0.05); }
+    .export-option-header { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
+    .export-option-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); }
+    .export-option h4 { font-size: 16px; }
+    .export-option p { font-size: 14px; margin: 0; }
+
+    .report-doc { font-size: 14px; line-height: 1.8; }
+    .report-doc h1 { font-size: 28px; margin-bottom: var(--space-2); }
+    .report-doc .subtitle { font-size: 16px; color: var(--fg-muted); margin-bottom: var(--space-8); }
+    .report-doc h2 { font-size: 20px; margin-top: var(--space-8); margin-bottom: var(--space-4); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border); }
+    .report-doc h3 { font-size: 16px; margin-top: var(--space-6); margin-bottom: var(--space-3); }
+    .report-doc p { color: var(--fg-muted); margin-bottom: var(--space-4); }
+    .report-doc table { width: 100%; border-collapse: collapse; margin: var(--space-4) 0; }
+    .report-doc th, .report-doc td { padding: var(--space-3); text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .report-doc th { font-weight: 600; color: var(--fg); background: var(--bg); }
+    .report-doc td { color: var(--fg-muted); }
+    .report-doc code { font-family: var(--font-mono); background: var(--bg-elevated); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: 13px; color: var(--accent-blue); }
+
+    .report-meta { display: flex; gap: var(--space-6); padding: var(--space-4); background: var(--bg); border-radius: var(--radius-md); margin-bottom: var(--space-6); }
+    .report-meta-item { font-size: 13px; color: var(--fg-muted); }
+    .report-meta-item strong { color: var(--fg); display: block; margin-bottom: var(--space-1); }
+
+    .repo-switcher { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: all var(--duration-fast) var(--ease-out); }
+    .repo-switcher:hover { border-color: var(--border-strong); }
+    .repo-switcher-icon { width: 20px; height: 20px; color: var(--fg-muted); }
+    .repo-switcher-name { font-size: 14px; font-weight: 500; }
+    .repo-switcher-arrow { margin-left: auto; color: var(--fg-subtle); }
+    @media (max-width: 1024px) { .reports-layout { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 28 28" fill="none" width="28" height="28">
+        <circle cx="14" cy="14" r="12" stroke="url(#logo-grad)" stroke-width="2"/>
+        <circle cx="14" cy="14" r="4" fill="url(#logo-grad)"/>
+        <line x1="14" y1="2" x2="14" y2="10" stroke="url(#logo-grad)" stroke-width="1.5"/>
+        <line x1="14" y1="18" x2="14" y2="26" stroke="url(#logo-grad)" stroke-width="1.5"/>
+        <line x1="2" y1="14" x2="10" y2="14" stroke="url(#logo-grad)" stroke-width="1.5"/>
+        <line x1="18" y1="14" x2="26" y2="14" stroke="url(#logo-grad)" stroke-width="1.5"/>
+        <defs>
+          <linearGradient id="logo-grad" x1="0" y1="0" x2="28" y2="28">
+            <stop stop-color="oklch(65% 0.22 245)"/>
+            <stop offset="1" stop-color="oklch(60% 0.25 300)"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>CodeAtlas</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Overview</div>
+      <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a href="analysis.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83"/></svg>Repository Analysis</a>
+      <a href="insights.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>AI Insights</a>
+      <a href="roadmap.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>Modernization Roadmap</a>
+      <div class="sidebar-section-label">Tools</div>
+      <a href="reports.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Reports</a>
+      <a href="demo.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Demo Mode</a>
+      <a href="settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33"/></svg>Settings</a>
+    </nav>
+    <div style="padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border);"><div style="display: flex; align-items: center; gap: var(--space-3);"><div class="profile-avatar">CA</div><div><div style="font-size: 14px; font-weight: 500;">Demo Workspace</div><div style="font-size: 12px; color: var(--fg-subtle);">IBM Bob Hackathon</div></div></div></div>
+  </aside>
+
+  <header class="topbar">
+    <div class="topbar-left"><div class="repo-switcher"><svg class="repo-switcher-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>        <span class="repo-switcher-name">fastapi/full-stack-fastapi-template</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="repo-switcher-arrow"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+    <div class="topbar-right"><div class="notification-bell"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><div class="notification-badge"></div></div><div class="profile-avatar">CA</div></div>
+  </header>
+
+  <main class="main-content">
+    <div class="main-content-inner">
+      <div style="margin-bottom: var(--space-6);"><h1 style="font-size: 28px; margin-bottom: var(--space-1);">Report Export</h1><p style="font-size: 14px; margin: 0;">Generate and share architecture analysis reports</p></div>
+
+      <div class="reports-layout">
+        <div class="report-options">
+          <div class="card export-option selected">
+            <div class="export-option-header">
+              <div class="export-option-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <div><h4>Executive Summary</h4></div>
+            </div>
+            <p>High-level overview with key metrics, risk assessment, and strategic recommendations. Ideal for leadership and stakeholders.</p>
+          </div>
+
+          <div class="card export-option">
+            <div class="export-option-header">
+              <div class="export-option-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-violet)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+              <div><h4>Technical Deep Dive</h4></div>
+            </div>
+            <p>Detailed module analysis, dependency graphs, complexity metrics, and specific refactoring recommendations for engineering teams.</p>
+          </div>
+
+          <div class="card export-option">
+            <div class="export-option-header">
+              <div class="export-option-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg></div>
+              <div><h4>Modernization Plan</h4></div>
+            </div>
+            <p>Phase-by-phase migration roadmap with effort estimates, cost projections, and ROI analysis for modernization initiatives.</p>
+          </div>
+
+          <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4);">
+            <button class="btn btn-primary" id="downloadReportBtn" style="flex: 1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Report</button>
+            <button class="btn btn-secondary" id="shareReportBtn" style="flex: 1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Copy to Clipboard</button>
+          </div>
+        </div>
+
+        <div class="report-preview">
+          <div class="preview-toolbar">
+            <div style="display: flex; align-items: center; gap: var(--space-2);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--fg-muted)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span style="font-size: 13px; color: var(--fg-muted);">Preview</span></div>
+            <div class="tabs"><button class="tab active">Preview</button><button class="tab">Markdown</button></div>
+          </div>
+          <div class="preview-content">
+            <div class="report-doc">
+              <div class="report-meta">
+                <div class="report-meta-item"><strong>Repository</strong>fastapi/full-stack-fastapi-template</div>
+                <div class="report-meta-item"><strong>Generated</strong>May 17, 2026</div>
+                <div class="report-meta-item"><strong>Files</strong>141</div>
+              </div>
+
+              <h1>Architecture Analysis Report</h1>
+              <p class="subtitle">Executive Summary — full-stack-fastapi-template</p>
+
+              <h2>Executive Overview</h2>
+              <p>This report presents a comprehensive analysis of the repository architecture, identifying critical risks, technical debt, and a phased modernization roadmap. The analysis covers 141 files across 2 languages totaling 10,912 LOC.</p>
+
+              <h2>Key Findings</h2>
+              <table>
+                <thead><tr><th>Metric</th><th>Value</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Architecture Health</td><td>35%</td><td style="color: var(--danger);">Weak</td></tr>
+                  <tr><td>Technical Debt</td><td>$75K</td><td style="color: var(--warning);">Moderate</td></tr>
+                  <tr><td>Critical Modules</td><td>1 file</td><td style="color: var(--danger);">Action Required</td></tr>
+                  <tr><td>Dependency Confidence</td><td>1%</td><td style="color: var(--danger);">Low</td></tr>
+                  <tr><td>Maintainability</td><td>79%</td><td style="color: var(--success);">Good</td></tr>
+                </tbody>
+              </table>
+
+              <h2>Critical Risks</h2>
+              <h3>Appearance.tsx — Highest Risk Component</h3>
+              <p>The <code>frontend/src/components/Common/Appearance.tsx</code> module has an 82% risk score and 0.11 centrality. It acts as a coupling point between UI and business logic layers, making changes to either layer potentially impact this component.</p>
+
+              <h3>Low Dependency Confidence</h3>
+              <p>Only 3 edges were resolved across 141 files (1% confidence). Framework aliases, dynamic imports, and convention-based routing prevent full static analysis. Improving import resolution should be prioritized.</p>
+
+              <h2>Modernization Actions</h2>
+              <p>Four-phase plan estimated at 8 weeks: stabilize critical modules, improve dependency visibility, reduce high-risk components, and conduct a readiness review.</p>
+
+              <h2>Limitations</h2>
+              <p>Analysis is limited to statically resolvable imports. Dynamic imports, framework conventions, and runtime-generated modules may not be fully represented in the dependency graph.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="static/js/api.js?v=2"></script>
+  <script src="static/js/state.js?v=2"></script>
+  <script src="static/js/repo-switcher.js?v=2"></script>
+  <script src="static/js/reports.js?v=2"></script>
+</body>
+</html>

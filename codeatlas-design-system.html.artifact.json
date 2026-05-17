@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "CodeAtlas — Landing Page",
+  "entry": "codeatlas-design-system.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-05-17T00:38:07.751Z",
+  "updatedAt": "2026-05-17T00:38:07.979Z",
+  "metadata": {
+    "identifier": "codeatlas-design-system",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}

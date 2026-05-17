@@ -1,0 +1,343 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeAtlas — AI Engineering Intelligence Platform</title>
+  <link rel="stylesheet" href="design-system.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; overflow: hidden; padding: 96px 24px; }
+    .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(100, 140, 255, 0.15), transparent); }
+    .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(100, 140, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(100, 140, 255, 0.03) 1px, transparent 1px); background-size: 60px 60px; }
+    .hero-content { position: relative; z-index: 1; max-width: 900px; }
+    .hero-kicker { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 13px; font-weight: 500; color: oklch(75% 0.18 200); background: rgba(80, 200, 255, 0.08); border: 1px solid rgba(80, 200, 255, 0.2); border-radius: 9999px; margin-bottom: 32px; animation: fadeInDown 400ms cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-kicker .dot { width: 6px; height: 6px; background: oklch(75% 0.18 200); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    .hero h1 { animation: fadeInUp 600ms cubic-bezier(0.16,1,0.3,1) 100ms both; margin-bottom: 24px; }
+    .hero p { font-size: 18px; max-width: 640px; margin: 0 auto 40px; animation: fadeInUp 600ms cubic-bezier(0.16,1,0.3,1) 200ms both; }
+    .hero-ctas { display: flex; align-items: center; justify-content: center; gap: 16px; animation: fadeInUp 600ms cubic-bezier(0.16,1,0.3,1) 300ms both; }
+    .hero-graph { position: absolute; inset: 0; z-index: 0; opacity: 0.4; }
+    .hero-graph canvas { width: 100%; height: 100%; }
+    .hero-preview { position: relative; z-index: 1; margin-top: 64px; animation: fadeInUp 600ms cubic-bezier(0.16,1,0.3,1) 400ms both; }
+    .preview-frame { width: 100%; max-width: 1100px; aspect-ratio: 16/9; background: oklch(20% 0.03 260); border: 1px solid oklch(40% 0.03 260); border-radius: 16px; box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 20px rgba(100,140,255,0.4), 0 0 40px rgba(100,140,255,0.15); overflow: hidden; position: relative; }
+    .preview-topbar { height: 40px; background: oklch(12% 0.02 260); border-bottom: 1px solid oklch(30% 0.02 260); display: flex; align-items: center; padding: 0 16px; gap: 8px; }
+    .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .preview-dot:nth-child(1) { background: #ff5f57; }
+    .preview-dot:nth-child(2) { background: #febc2e; }
+    .preview-dot:nth-child(3) { background: #28c840; }
+    .preview-content { padding: 24px; display: grid; grid-template-columns: 200px 1fr 280px; gap: 16px; height: calc(100% - 40px); }
+    .preview-sidebar { display: flex; flex-direction: column; gap: 8px; }
+    .preview-sidebar-item { height: 32px; background: oklch(16% 0.025 260); border-radius: 6px; }
+    .preview-sidebar-item.active { background: oklch(28% 0.04 260); border-left: 2px solid oklch(65% 0.22 245); }
+    .preview-main { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 16px; }
+    .preview-card { background: oklch(16% 0.025 260); border: 1px solid oklch(30% 0.02 260); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .preview-card-label { height: 10px; width: 60%; background: oklch(28% 0.04 260); border-radius: 6px; }
+    .preview-card-value { height: 24px; width: 40%; background: linear-gradient(135deg, oklch(65% 0.22 245), oklch(60% 0.25 300)); border-radius: 6px; opacity: 0.6; }
+    .preview-card-bar { height: 6px; background: oklch(28% 0.04 260); border-radius: 9999px; margin-top: auto; position: relative; overflow: hidden; }
+    .preview-card-bar::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 70%; background: linear-gradient(135deg, oklch(65% 0.22 245), oklch(60% 0.25 300)); border-radius: 9999px; }
+    .preview-right { display: flex; flex-direction: column; gap: 12px; }
+    .preview-ai-card { background: linear-gradient(135deg, rgba(100,140,255,0.08), rgba(140,80,255,0.08)); border: 1px solid rgba(100,140,255,0.2); border-radius: 8px; padding: 16px; flex: 1; }
+    .preview-ai-line { height: 8px; background: oklch(28% 0.04 260); border-radius: 6px; margin-bottom: 8px; }
+    .preview-ai-line:nth-child(2) { width: 80%; }
+    .preview-ai-line:nth-child(3) { width: 60%; }
+    .preview-ai-line:nth-child(4) { width: 90%; }
+    .section-header { text-align: center; max-width: 700px; margin: 0 auto 64px; }
+    .section-header h2 { margin-bottom: 16px; }
+    .section-header p { font-size: 17px; }
+    .problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .problem-card { padding: 32px; text-align: center; }
+    .problem-icon { width: 56px; height: 56px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(100,140,255,0.1), rgba(140,80,255,0.1)); border: 1px solid rgba(100,140,255,0.2); border-radius: 12px; font-size: 24px; }
+    .problem-card h3 { margin-bottom: 12px; font-size: 20px; }
+    .problem-card p { font-size: 15px; }
+    .architecture-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .architecture-text h2 { margin-bottom: 24px; }
+    .architecture-text p { margin-bottom: 24px; font-size: 16px; }
+    .architecture-features { display: flex; flex-direction: column; gap: 16px; }
+    .architecture-feature { display: flex; align-items: flex-start; gap: 16px; }
+    .feature-check { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: rgba(80,200,120,0.1); border: 1px solid rgba(80,200,120,0.3); border-radius: 50%; color: oklch(70% 0.18 145); font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+    .feature-text h4 { font-size: 16px; margin-bottom: 4px; }
+    .feature-text p { font-size: 14px; margin: 0; }
+    .architecture-graph { aspect-ratio: 1; background: oklch(20% 0.03 260); border: 1px solid oklch(30% 0.02 260); border-radius: 16px; position: relative; overflow: hidden; }
+    .architecture-graph::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(100,140,255,0.08), transparent 70%); }
+    .blast-visual { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
+    .blast-graph { aspect-ratio: 4/3; background: oklch(20% 0.03 260); border: 1px solid oklch(30% 0.02 260); border-radius: 16px; position: relative; overflow: hidden; }
+    .blast-stats { display: flex; flex-direction: column; gap: 24px; }
+    .blast-stat { padding: 24px; }
+    .blast-stat-label { font-size: 13px; color: oklch(45% 0.01 260); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .blast-stat-value { font-size: 36px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+    .blast-stat-value.danger { color: oklch(60% 0.22 25); }
+    .blast-stat-value.warning { color: oklch(75% 0.16 85); }
+    .blast-stat-value.success { color: oklch(70% 0.18 145); }
+    .modernization-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .modernization-card { padding: 32px; position: relative; overflow: hidden; }
+    .modernization-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(135deg, oklch(65% 0.22 245), oklch(60% 0.25 300)); }
+    .modernization-card h3 { margin-bottom: 12px; }
+    .modernization-card p { margin-bottom: 16px; }
+    .modernization-metric { display: flex; align-items: baseline; gap: 8px; }
+    .modernization-metric .value { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .modernization-metric .label { font-size: 14px; color: oklch(65% 0.015 260); }
+    .ai-risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .ai-risk-card { padding: 24px; }
+    .ai-risk-level { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; font-size: 12px; font-weight: 600; border-radius: 9999px; margin-bottom: 16px; }
+    .ai-risk-level.high { background: rgba(255,70,70,0.1); color: oklch(60% 0.22 25); border: 1px solid rgba(255,70,70,0.3); }
+    .ai-risk-level.medium { background: rgba(255,180,50,0.1); color: oklch(75% 0.16 85); border: 1px solid rgba(255,180,50,0.3); }
+    .ai-risk-level.low { background: rgba(80,200,120,0.1); color: oklch(70% 0.18 145); border: 1px solid rgba(80,200,120,0.3); }
+    .ai-risk-card h4 { margin-bottom: 8px; }
+    .ai-risk-card p { font-size: 14px; margin-bottom: 16px; }
+    .ai-risk-detail { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: oklch(45% 0.01 260); background: oklch(12% 0.02 260); padding: 12px; border-radius: 6px; border: 1px solid oklch(30% 0.02 260); }
+    .before-after { display: grid; grid-template-columns: 1fr auto 1fr; gap: 32px; align-items: center; }
+    .before-after-card { padding: 32px; }
+    .before-after-card.before { border-color: rgba(255,70,70,0.3); }
+    .before-after-card.after { border-color: rgba(80,200,120,0.3); background: linear-gradient(135deg, rgba(80,200,120,0.05), rgba(100,140,255,0.05)); }
+    .before-after-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 24px; }
+    .before-after-label.before-label { color: oklch(60% 0.22 25); }
+    .before-after-label.after-label { color: oklch(70% 0.18 145); }
+    .before-after-metrics { display: flex; flex-direction: column; gap: 16px; }
+    .before-after-metric { display: flex; justify-content: space-between; align-items: center; }
+    .before-after-metric .label { font-size: 14px; color: oklch(65% 0.015 260); }
+    .before-after-metric .value { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 500; }
+    .before-after-arrow { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: linear-gradient(135deg, oklch(65% 0.22 245), oklch(60% 0.25 300)); border-radius: 50%; box-shadow: 0 0 20px rgba(100,140,255,0.4), 0 0 40px rgba(100,140,255,0.15); font-size: 24px; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial-card { padding: 32px; }
+    .testimonial-quote { font-size: 16px; font-style: italic; color: oklch(96% 0.005 260); margin-bottom: 24px; line-height: 1.7; }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .testimonial-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, oklch(65% 0.22 245), oklch(60% 0.25 300)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px; }
+    .testimonial-name { font-size: 14px; font-weight: 500; }
+    .testimonial-role { font-size: 13px; color: oklch(45% 0.01 260); }
+    .enterprise-cta { text-align: center; padding: 96px 24px; position: relative; }
+    .enterprise-cta::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(100,140,255,0.15), transparent); }
+    .enterprise-cta > * { position: relative; z-index: 1; }
+    .enterprise-cta h2 { margin-bottom: 24px; }
+    .enterprise-cta p { font-size: 18px; max-width: 600px; margin: 0 auto 40px; }
+    .enterprise-features { display: flex; align-items: center; justify-content: center; gap: 32px; margin-top: 48px; }
+    .enterprise-feature { display: flex; align-items: center; gap: 8px; font-size: 14px; color: oklch(65% 0.015 260); }
+    .enterprise-feature svg { width: 16px; height: 16px; color: oklch(70% 0.18 145); }
+    .footer { padding: 48px 24px; border-top: 1px solid oklch(30% 0.02 260); }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; max-width: 1280px; margin: 0 auto; }
+    .footer-logo { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 600; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { color: oklch(65% 0.015 260); text-decoration: none; font-size: 14px; transition: color 150ms cubic-bezier(0.16,1,0.3,1); }
+    .footer-links a:hover { color: oklch(96% 0.005 260); }
+    .footer-copy { font-size: 13px; color: oklch(45% 0.01 260); }
+    .landing-nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(12,14,26,0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid oklch(30% 0.02 260); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100; }
+    .landing-nav-logo { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 600; text-decoration: none; color: oklch(96% 0.005 260); }
+    .landing-nav-logo svg { width: 28px; height: 28px; }
+    .landing-nav-links { display: flex; align-items: center; gap: 24px; }
+    .landing-nav-links a { color: oklch(65% 0.015 260); text-decoration: none; font-size: 14px; transition: color 150ms cubic-bezier(0.16,1,0.3,1); }
+    .landing-nav-links a:hover { color: oklch(96% 0.005 260); }
+    .metrics-strip { display: flex; align-items: center; justify-content: center; gap: 48px; padding: 24px; margin-top: 32px; animation: fadeInUp 600ms cubic-bezier(0.16,1,0.3,1) 500ms both; }
+    .metric-item { text-align: center; }
+    .metric-value { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+    .metric-label { font-size: 13px; color: oklch(45% 0.01 260); margin-top: 4px; }
+    .gradient-text { background: linear-gradient(135deg, oklch(65% 0.22 245), oklch(60% 0.25 300)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    @media (max-width: 1024px) { .preview-content { grid-template-columns: 1fr; } .preview-sidebar, .preview-right { display: none; } .problem-grid, .architecture-visual, .blast-visual, .modernization-cards, .ai-risk-grid, .before-after, .testimonials-grid { grid-template-columns: 1fr; } .enterprise-features { flex-direction: column; gap: 16px; } .before-after-arrow { margin: 0 auto; } }
+    @media (max-width: 768px) { .hero-ctas { flex-direction: column; } .metrics-strip { flex-direction: column; gap: 24px; } .landing-nav-links { display: none; } }
+  </style>
+</head>
+<body>
+  <nav class="landing-nav">
+    <a href="#" class="landing-nav-logo">
+      <svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12" stroke="url(#lg)" stroke-width="2"/><circle cx="14" cy="14" r="4" fill="url(#lg)"/><line x1="14" y1="2" x2="14" y2="10" stroke="url(#lg)" stroke-width="1.5"/><line x1="14" y1="18" x2="14" y2="26" stroke="url(#lg)" stroke-width="1.5"/><line x1="2" y1="14" x2="10" y2="14" stroke="url(#lg)" stroke-width="1.5"/><line x1="18" y1="14" x2="26" y2="14" stroke="url(#lg)" stroke-width="1.5"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="oklch(65% 0.22 245)"/><stop offset="1" stop-color="oklch(60% 0.25 300)"/></linearGradient></defs></svg>
+      CodeAtlas
+    </a>
+    <div class="landing-nav-links">
+      <a href="#features">Features</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#ai">AI Intelligence</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="demo.html">Demo</a>
+      <a href="dashboard.html" class="btn btn-primary btn-sm">Launch App</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-graph"><canvas id="heroGraphCanvas"></canvas></div>
+    <div class="hero-content">
+      <div class="hero-kicker"><span class="dot"></span>AI-Powered Engineering Intelligence</div>
+      <h1>Understand any codebase.<br><span class="gradient-text">Modernize with confidence.</span></h1>
+      <p>CodeAtlas maps, analyzes, and transforms complex codebases using AI. Visualize dependencies, simulate blast radius, and generate modernization roadmaps — all in one platform.</p>
+      <div class="hero-ctas">
+        <a href="dashboard.html" class="btn btn-primary btn-lg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Start Analyzing</a>
+        <a href="demo.html" class="btn btn-secondary btn-lg">Watch Demo</a>
+      </div>
+      <div class="metrics-strip">
+        <div class="metric-item"><div class="metric-value gradient-text">2.4M+</div><div class="metric-label">Lines Analyzed</div></div>
+        <div class="metric-item"><div class="metric-value gradient-text">847</div><div class="metric-label">Repositories Mapped</div></div>
+        <div class="metric-item"><div class="metric-value gradient-text">94%</div><div class="metric-label">Risk Detection Rate</div></div>
+        <div class="metric-item"><div class="metric-value gradient-text">3.2x</div><div class="metric-label">Faster Modernization</div></div>
+      </div>
+    </div>
+    <div class="hero-preview">
+      <div class="preview-frame">
+        <div class="preview-topbar"><div class="preview-dot"></div><div class="preview-dot"></div><div class="preview-dot"></div></div>
+        <div class="preview-content">
+          <div class="preview-sidebar"><div class="preview-sidebar-item active"></div><div class="preview-sidebar-item"></div><div class="preview-sidebar-item"></div><div class="preview-sidebar-item"></div><div class="preview-sidebar-item"></div></div>
+          <div class="preview-main">
+            <div class="preview-card"><div class="preview-card-label"></div><div class="preview-card-value"></div><div class="preview-card-bar"></div></div>
+            <div class="preview-card"><div class="preview-card-label"></div><div class="preview-card-value"></div><div class="preview-card-bar"></div></div>
+            <div class="preview-card"><div class="preview-card-label"></div><div class="preview-card-value"></div><div class="preview-card-bar"></div></div>
+            <div class="preview-card"><div class="preview-card-label"></div><div class="preview-card-value"></div><div class="preview-card-bar"></div></div>
+          </div>
+          <div class="preview-right">
+            <div class="preview-ai-card"><div class="preview-ai-line"></div><div class="preview-ai-line"></div><div class="preview-ai-line"></div><div class="preview-ai-line"></div></div>
+            <div class="preview-ai-card"><div class="preview-ai-line"></div><div class="preview-ai-line"></div><div class="preview-ai-line"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header"><h2>Engineering teams are flying blind</h2><p>Legacy codebases grow opaque over time. Without visibility into architecture, risk, and debt, every change is a gamble.</p></div>
+      <div class="problem-grid">
+        <div class="card problem-card"><div class="problem-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="oklch(65% 0.22 245)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div><h3>Hidden Dependencies</h3><p>Critical modules with undocumented coupling. One change cascades across the system with no warning.</p></div>
+        <div class="card problem-card"><div class="problem-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="oklch(60% 0.25 300)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h3>Accumulated Debt</h3><p>Technical debt compounds silently. Teams spend 40% of cycles on maintenance instead of innovation.</p></div>
+        <div class="card problem-card"><div class="problem-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="oklch(75% 0.18 200)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h3>Modernization Risk</h3><p>Migrating without a map. Teams guess at priorities, miss critical paths, and blow timelines.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="architecture">
+    <div class="container">
+      <div class="architecture-visual">
+        <div class="architecture-text"><h2>Architecture intelligence,<br><span class="gradient-text">automated</span></h2><p>CodeAtlas ingests your repository and builds a living map of every module, dependency, and coupling — updated with every commit.</p>
+          <div class="architecture-features">
+            <div class="architecture-feature"><div class="feature-check">✓</div><div class="feature-text"><h4>Dependency Graph</h4><p>Interactive visualization of every module relationship with real-time filtering.</p></div></div>
+            <div class="architecture-feature"><div class="feature-check">✓</div><div class="feature-text"><h4>Architecture Layers</h4><p>Automatic detection of presentation, business logic, and data access layers.</p></div></div>
+            <div class="architecture-feature"><div class="feature-check">✓</div><div class="feature-text"><h4>Coupling Analysis</h4><p>Identify tight coupling, circular dependencies, and architectural violations.</p></div></div>
+            <div class="architecture-feature"><div class="feature-check">✓</div><div class="feature-text"><h4>Health Scoring</h4><p>Per-module health metrics based on complexity, test coverage, and change frequency.</p></div></div>
+          </div>
+        </div>
+        <div class="architecture-graph" id="archGraph"><canvas id="archGraphCanvas"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="blast-visual">
+        <div class="blast-graph" id="blastGraph"><canvas id="blastGraphCanvas"></canvas></div>
+        <div class="blast-stats">
+          <h2>Simulate impact<br><span class="gradient-text">before you ship</span></h2>
+          <p>Change any module and see exactly what breaks. CodeAtlas traces the blast radius across your entire codebase.</p>
+          <div class="card blast-stat"><div class="blast-stat-label">Affected Modules</div><div class="blast-stat-value danger">47</div></div>
+          <div class="card blast-stat"><div class="blast-stat-label">Test Coverage Gap</div><div class="blast-stat-value warning">23%</div></div>
+          <div class="card blast-stat"><div class="blast-stat-label">Estimated Risk Score</div><div class="blast-stat-value success">7.2 / 10</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header"><h2>Modernization engine</h2><p>AI-generated roadmaps that prioritize by business impact, not just technical urgency.</p></div>
+      <div class="modernization-cards">
+        <div class="card modernization-card"><h3>Automated Roadmaps</h3><p>Phase-by-phase migration plans with effort estimates, dependency ordering, and rollback strategies.</p><div class="modernization-metric"><span class="value gradient-text">3.2x</span><span class="label">faster than manual planning</span></div></div>
+        <div class="card modernization-card"><h3>Cost Projections</h3><p>Engineering hours, opportunity cost, and ROI for every migration path — so you can justify the investment.</p><div class="modernization-metric"><span class="value gradient-text">68%</span><span class="label">more accurate estimates</span></div></div>
+        <div class="card modernization-card"><h3>Incremental Migration</h3><p>Strangler fig patterns, feature flags, and parallel run strategies that keep production stable.</p><div class="modernization-metric"><span class="value gradient-text">0</span><span class="label">downtime during migration</span></div></div>
+        <div class="card modernization-card"><h3>Progress Tracking</h3><p>Real-time dashboards showing migration progress, blocked items, and emerging risks as you modernize.</p><div class="modernization-metric"><span class="value gradient-text">94%</span><span class="label">on-time delivery rate</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="ai">
+    <div class="container">
+      <div class="section-header"><h2>AI risk analysis</h2><p>Natural language explanations of architectural risk, written for engineers and executives alike.</p></div>
+      <div class="ai-risk-grid">
+        <div class="ai-card ai-risk-card"><div class="ai-risk-level high">HIGH RISK</div><h4>Authentication Module</h4><p>Single point of failure with 12 downstream dependencies. No fallback mechanism detected.</p><div class="ai-risk-detail">auth.py → 12 modules → 47 files</div></div>
+        <div class="ai-card ai-risk-card"><div class="ai-risk-level medium">MEDIUM RISK</div><h4>Payment Processing</h4><p>Circular dependency between billing and order modules. Refactoring recommended before Q3.</p><div class="ai-risk-detail">billing.py ↔ orders.py → 8 files</div></div>
+        <div class="ai-card ai-risk-card"><div class="ai-risk-level low">LOW RISK</div><h4>Notification Service</h4><p>Well-isolated module with comprehensive test coverage. No immediate action required.</p><div class="ai-risk-detail">notify.py → 3 modules → 12 files</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header"><h2>Before & after CodeAtlas</h2><p>Engineering teams that adopt CodeAtlas see measurable improvements across every dimension.</p></div>
+      <div class="before-after">
+        <div class="card before-after-card before"><div class="before-after-label before-label">Before</div><div class="before-after-metrics"><div class="before-after-metric"><span class="label">Time to understand codebase</span><span class="value" style="color: oklch(60% 0.22 25)">6–8 weeks</span></div><div class="before-after-metric"><span class="label">Incident rate after changes</span><span class="value" style="color: oklch(60% 0.22 25)">34%</span></div><div class="before-after-metric"><span class="label">Modernization planning</span><span class="value" style="color: oklch(60% 0.22 25)">Manual, incomplete</span></div><div class="before-after-metric"><span class="label">Risk visibility</span><span class="value" style="color: oklch(60% 0.22 25)">Reactive</span></div></div></div>
+        <div class="before-after-arrow">→</div>
+        <div class="card before-after-card after"><div class="before-after-label after-label">After</div><div class="before-after-metrics"><div class="before-after-metric"><span class="label">Time to understand codebase</span><span class="value" style="color: oklch(70% 0.18 145)">2 days</span></div><div class="before-after-metric"><span class="label">Incident rate after changes</span><span class="value" style="color: oklch(70% 0.18 145)">4%</span></div><div class="before-after-metric"><span class="label">Modernization planning</span><span class="value" style="color: oklch(70% 0.18 145)">AI-generated, phased</span></div><div class="before-after-metric"><span class="label">Risk visibility</span><span class="value" style="color: oklch(70% 0.18 145)">Proactive</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header"><h2>Trusted by engineering leaders</h2><p>From startups to enterprises, teams use CodeAtlas to ship with confidence.</p></div>
+      <div class="testimonials-grid">
+        <div class="card testimonial-card"><div class="testimonial-quote">"CodeAtlas found a critical circular dependency we'd been shipping around for 18 months. It paid for itself in the first week."</div><div class="testimonial-author"><div class="testimonial-avatar">SK</div><div><div class="testimonial-name">Sarah Kim</div><div class="testimonial-role">VP Engineering, Finova</div></div></div></div>
+        <div class="card testimonial-card"><div class="testimonial-quote">"The blast radius simulation alone saved us from a production incident that would have taken down our payment pipeline."</div><div class="testimonial-author"><div class="testimonial-avatar">MR</div><div><div class="testimonial-name">Marcus Rivera</div><div class="testimonial-role">Staff Engineer, CloudBase</div></div></div></div>
+        <div class="card testimonial-card"><div class="testimonial-quote">"We migrated a 2M-line monolith in 6 months using CodeAtlas roadmaps. Our CTO called it the best investment we made all year."</div><div class="testimonial-author"><div class="testimonial-avatar">AL</div><div><div class="testimonial-name">Aisha Laurent</div><div class="testimonial-role">Engineering Director, Nexora</div></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="enterprise-cta">
+    <h2>Ready to map your<br><span class="gradient-text">entire codebase?</span></h2>
+    <p>Connect your repository and get a complete architecture analysis in minutes — not weeks.</p>
+    <div class="hero-ctas">
+      <a href="dashboard.html" class="btn btn-primary btn-lg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Start Free Analysis</a>
+      <a href="#" class="btn btn-secondary btn-lg">Talk to Sales</a>
+    </div>
+    <div class="enterprise-features">
+      <div class="enterprise-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>SOC 2 Compliant</div>
+      <div class="enterprise-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>SSO / SAML</div>
+      <div class="enterprise-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>On-Prem Available</div>
+      <div class="enterprise-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>99.9% Uptime SLA</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo"><svg width="24" height="24" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12" stroke="url(#lg2)" stroke-width="2"/><circle cx="14" cy="14" r="4" fill="url(#lg2)"/><defs><linearGradient id="lg2" x1="0" y1="0" x2="28" y2="28"><stop stop-color="oklch(65% 0.22 245)"/><stop offset="1" stop-color="oklch(60% 0.25 300)"/></linearGradient></defs></svg>CodeAtlas</div>
+        <div class="footer-links"><a href="#">Documentation</a><a href="#">API Reference</a><a href="#">Status</a><a href="#">Privacy</a><a href="#">Terms</a></div>
+        <div class="footer-copy">© 2026 CodeAtlas, Inc.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const heroCanvas = document.getElementById('heroGraphCanvas');
+    const heroCtx = heroCanvas.getContext('2d');
+    function resizeHeroCanvas() { heroCanvas.width = heroCanvas.offsetWidth * window.devicePixelRatio; heroCanvas.height = heroCanvas.offsetHeight * window.devicePixelRatio; heroCtx.scale(window.devicePixelRatio, window.devicePixelRatio); }
+    resizeHeroCanvas();
+    window.addEventListener('resize', resizeHeroCanvas);
+    const nodes = []; const edges = []; const nodeCount = 40;
+    for (let i = 0; i < nodeCount; i++) { nodes.push({ x: Math.random() * heroCanvas.offsetWidth, y: Math.random() * heroCanvas.offsetHeight, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, r: Math.random() * 3 + 2, opacity: Math.random() * 0.5 + 0.2 }); }
+    for (let i = 0; i < nodeCount; i++) { const connections = Math.floor(Math.random() * 2) + 1; for (let j = 0; j < connections; j++) { const target = Math.floor(Math.random() * nodeCount); if (target !== i) edges.push([i, target]); } }
+    function animateHeroGraph() { const w = heroCanvas.offsetWidth; const h = heroCanvas.offsetHeight; heroCtx.clearRect(0, 0, w, h); nodes.forEach(n => { n.x += n.vx; n.y += n.vy; if (n.x < 0 || n.x > w) n.vx *= -1; if (n.y < 0 || n.y > h) n.vy *= -1; }); edges.forEach(([a, b]) => { const na = nodes[a]; const nb = nodes[b]; heroCtx.beginPath(); heroCtx.moveTo(na.x, na.y); heroCtx.lineTo(nb.x, nb.y); heroCtx.strokeStyle = 'rgba(100, 140, 255, 0.08)'; heroCtx.lineWidth = 1; heroCtx.stroke(); }); nodes.forEach(n => { heroCtx.beginPath(); heroCtx.arc(n.x, n.y, n.r, 0, Math.PI * 2); heroCtx.fillStyle = 'rgba(100, 140, 255, ' + n.opacity + ')'; heroCtx.fill(); }); requestAnimationFrame(animateHeroGraph); }
+    animateHeroGraph();
+
+    const archCanvas = document.getElementById('archGraphCanvas');
+    const archCtx = archCanvas.getContext('2d');
+    function resizeArchCanvas() { const container = document.getElementById('archGraph'); archCanvas.width = container.offsetWidth * window.devicePixelRatio; archCanvas.height = container.offsetHeight * window.devicePixelRatio; archCtx.scale(window.devicePixelRatio, window.devicePixelRatio); }
+    resizeArchCanvas();
+    window.addEventListener('resize', resizeArchCanvas);
+    const archNodes = [{ x: 0.5, y: 0.15, label: 'API Gateway', r: 28 }, { x: 0.25, y: 0.4, label: 'Auth', r: 22 }, { x: 0.5, y: 0.4, label: 'Users', r: 20 }, { x: 0.75, y: 0.4, label: 'Billing', r: 22 }, { x: 0.15, y: 0.65, label: 'DB', r: 18 }, { x: 0.38, y: 0.65, label: 'Cache', r: 16 }, { x: 0.62, y: 0.65, label: 'Queue', r: 16 }, { x: 0.85, y: 0.65, label: 'Storage', r: 18 }, { x: 0.5, y: 0.85, label: 'Analytics', r: 20 }];
+    const archEdges = [[0,1],[0,2],[0,3],[1,4],[2,4],[3,4],[1,5],[2,5],[3,6],[3,7],[4,8],[5,8],[6,8]];
+    let archTime = 0;
+    function animateArchGraph() { const w = archCanvas.offsetWidth; const h = archCanvas.offsetHeight; archCtx.clearRect(0, 0, w, h); archTime += 0.01; archEdges.forEach(([a, b]) => { const na = archNodes[a]; const nb = archNodes[b]; const x1 = na.x * w; const y1 = na.y * h; const x2 = nb.x * w; const y2 = nb.y * h; archCtx.beginPath(); archCtx.moveTo(x1, y1); archCtx.lineTo(x2, y2); archCtx.strokeStyle = 'rgba(100, 140, 255, 0.15)'; archCtx.lineWidth = 1.5; archCtx.stroke(); const t = (archTime * 0.5 + a * 0.1) % 1; const dx = x1 + (x2 - x1) * t; const dy = y1 + (y2 - y1) * t; archCtx.beginPath(); archCtx.arc(dx, dy, 2, 0, Math.PI * 2); archCtx.fillStyle = 'rgba(100, 140, 255, 0.6)'; archCtx.fill(); }); archNodes.forEach(n => { const x = n.x * w; const y = n.y * h; const pulse = Math.sin(archTime * 2 + n.x * 10) * 0.15 + 1; archCtx.beginPath(); archCtx.arc(x, y, n.r * pulse, 0, Math.PI * 2); archCtx.fillStyle = 'rgba(20, 22, 40, 0.8)'; archCtx.fill(); archCtx.strokeStyle = 'rgba(100, 140, 255, 0.6)'; archCtx.lineWidth = 2; archCtx.stroke(); archCtx.fillStyle = 'rgba(240, 242, 255, 0.9)'; archCtx.font = '11px Inter, sans-serif'; archCtx.textAlign = 'center'; archCtx.textBaseline = 'middle'; archCtx.fillText(n.label, x, y); }); requestAnimationFrame(animateArchGraph); }
+    animateArchGraph();
+
+    const blastCanvas = document.getElementById('blastGraphCanvas');
+    const blastCtx = blastCanvas.getContext('2d');
+    function resizeBlastCanvas() { const container = document.getElementById('blastGraph'); blastCanvas.width = container.offsetWidth * window.devicePixelRatio; blastCanvas.height = container.offsetHeight * window.devicePixelRatio; blastCtx.scale(window.devicePixelRatio, window.devicePixelRatio); }
+    resizeBlastCanvas();
+    window.addEventListener('resize', resizeBlastCanvas);
+    const blastCenter = { x: 0.5, y: 0.5 };
+    const blastRings = [{ radius: 0.08, color: 'rgba(255, 70, 70, 0.4)' }, { radius: 0.18, color: 'rgba(255, 180, 50, 0.3)' }, { radius: 0.3, color: 'rgba(100, 140, 255, 0.2)' }, { radius: 0.42, color: 'rgba(80, 200, 120, 0.15)' }];
+    const blastNodes = [{ x: 0.5, y: 0.5, r: 12, label: 'auth.py', ring: 0 }, { x: 0.42, y: 0.42, r: 8, label: 'users.py', ring: 1 }, { x: 0.58, y: 0.38, r: 8, label: 'session.py', ring: 1 }, { x: 0.35, y: 0.55, r: 7, label: 'db.py', ring: 2 }, { x: 0.65, y: 0.52, r: 7, label: 'cache.py', ring: 2 }, { x: 0.48, y: 0.68, r: 6, label: 'api.py', ring: 2 }, { x: 0.28, y: 0.35, r: 5, label: 'models.py', ring: 3 }, { x: 0.72, y: 0.65, r: 5, label: 'utils.py', ring: 3 }, { x: 0.22, y: 0.7, r: 5, label: 'config.py', ring: 3 }, { x: 0.78, y: 0.3, r: 5, label: 'tests.py', ring: 3 }];
+    let blastTime = 0;
+    function animateBlastGraph() { const w = blastCanvas.offsetWidth; const h = blastCanvas.offsetHeight; blastCtx.clearRect(0, 0, w, h); blastTime += 0.015; blastRings.forEach((ring, i) => { const pulse = Math.sin(blastTime * 2 + i) * 0.02 + 1; blastCtx.beginPath(); blastCtx.arc(w * blastCenter.x, h * blastCenter.y, ring.radius * Math.min(w, h) * pulse, 0, Math.PI * 2); blastCtx.strokeStyle = ring.color; blastCtx.lineWidth = 1; blastCtx.stroke(); }); blastNodes.forEach(n => { const x = n.x * w; const y = n.y * h; const ringColor = blastRings[n.ring].color; blastCtx.beginPath(); blastCtx.arc(x, y, n.r, 0, Math.PI * 2); blastCtx.fillStyle = n.ring === 0 ? 'rgba(255, 70, 70, 0.8)' : 'rgba(20, 22, 40, 0.8)'; blastCtx.fill(); blastCtx.strokeStyle = ringColor; blastCtx.lineWidth = 1.5; blastCtx.stroke(); if (n.r > 6) { blastCtx.fillStyle = 'rgba(240, 242, 255, 0.8)'; blastCtx.font = '10px Inter, sans-serif'; blastCtx.textAlign = 'center'; blastCtx.fillText(n.label, x, y + n.r + 14); } if (n.ring > 0) { blastCtx.beginPath(); blastCtx.moveTo(w * blastCenter.x, h * blastCenter.y); blastCtx.lineTo(x, y); blastCtx.strokeStyle = 'rgba(100, 140, 255, 0.1)'; blastCtx.lineWidth = 1; blastCtx.stroke(); } }); requestAnimationFrame(animateBlastGraph); }
+    animateBlastGraph();
+  </script>
+</body>
+</html>

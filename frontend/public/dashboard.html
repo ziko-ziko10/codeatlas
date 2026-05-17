@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — CodeAtlas</title>
+  <link rel="stylesheet" href="design-system.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Dashboard-specific */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .metric-card {
+      padding: var(--space-5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+    }
+
+    .metric-card-label {
+      font-size: 13px;
+      color: var(--fg-subtle);
+      font-weight: 500;
+    }
+
+    .metric-card-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      background: rgba(100, 140, 255, 0.1);
+      color: var(--accent-blue);
+    }
+
+    .metric-card-value {
+      font-size: 28px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-2);
+    }
+
+    .metric-card-change {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .metric-card-change.positive { color: var(--success); }
+    .metric-card-change.negative { color: var(--danger); }
+
+    .metric-card-sparkline {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      opacity: 0.3;
+    }
+
+    /* Main layout */
+    .dashboard-main {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: var(--space-6);
+    }
+
+    .dashboard-left {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .dashboard-right {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    /* Chart card */
+    .chart-card {
+      padding: var(--space-6);
+    }
+
+    .chart-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+    }
+
+    .chart-card-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 200px;
+      position: relative;
+    }
+
+    .chart-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    .metric-card-sparkline {
+      width: 100% !important;
+      height: 40px !important;
+      display: block;
+    }
+
+    .blast-preview-canvas {
+      width: 100% !important;
+      height: 420px !important;
+      display: block;
+    }
+
+    /* Architecture Review */
+    .architecture-review, .ai-narrator {
+      padding: var(--space-6);
+    }
+
+    .architecture-review-header, .ai-narrator-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .architecture-review-icon, .ai-narrator-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-active);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .architecture-review-title, .ai-narrator-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .architecture-review-status, .ai-narrator-status {
+      font-size: 12px;
+      color: var(--fg-subtle);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .architecture-review-status .dot, .ai-narrator-status .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--fg-subtle);
+      border-radius: 50%;
+    }
+
+    .architecture-review-content, .ai-narrator-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--fg-muted);
+    }
+
+    .architecture-review-content strong, .ai-narrator-content strong {
+      color: var(--fg);
+      font-weight: 500;
+    }
+
+    /* Risk Distribution */
+    .risk-distribution {
+      padding: var(--space-6);
+    }
+
+    .risk-bar {
+      display: flex;
+      height: 32px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: var(--space-4);
+    }
+
+    .risk-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+
+    .risk-segment:hover {
+      filter: brightness(1.2);
+    }
+
+    .risk-legend {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .risk-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 13px;
+      color: var(--fg-muted);
+    }
+
+    .risk-legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Repository Activity */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      transition: background var(--duration-fast) var(--ease-out);
+    }
+
+    .activity-item:hover {
+      background: var(--bg);
+    }
+
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .activity-dot.success { background: var(--success); }
+    .activity-dot.warning { background: var(--warning); }
+    .activity-dot.danger { background: var(--danger); }
+    .activity-dot.info { background: var(--info); }
+
+    .activity-text {
+      font-size: 14px;
+      color: var(--fg-muted);
+      line-height: 1.5;
+    }
+
+    .activity-text strong {
+      color: var(--fg);
+      font-weight: 500;
+    }
+
+    .activity-time {
+      font-size: 12px;
+      color: var(--fg-subtle);
+      margin-top: var(--space-1);
+    }
+
+    /* Blast Radius Preview */
+    .blast-preview {
+      padding: var(--space-6);
+    }
+
+    .blast-preview-canvas {
+      width: 100%;
+      height: 400px;
+      border-radius: var(--radius-md);
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+    }
+
+    /* Dependency Confidence */
+    .confidence-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
+    }
+
+    .confidence-item {
+      padding: var(--space-4);
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .confidence-label {
+      font-size: 12px;
+      color: var(--fg-subtle);
+      margin-bottom: var(--space-2);
+    }
+
+    .confidence-value {
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Repo Switcher */
+    .repo-switcher {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .repo-switcher:hover {
+      border-color: var(--border-strong);
+    }
+
+    .repo-switcher-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--fg-muted);
+    }
+
+    .repo-switcher-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .repo-switcher-arrow {
+      margin-left: auto;
+      color: var(--fg-subtle);
+    }
+
+    /* Profile */
+    .profile-avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Notification bell */
+    .notification-bell {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg-muted);
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .notification-bell:hover {
+      color: var(--fg);
+      background: var(--bg-elevated);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 8px;
+      height: 8px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+    }
+
+    /* Command palette trigger */
+    .cmd-trigger {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--fg-subtle);
+      cursor: pointer;
+      min-width: 200px;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .cmd-trigger:hover {
+      border-color: var(--border-strong);
+      color: var(--fg-muted);
+    }
+
+    .cmd-trigger kbd {
+      margin-left: auto;
+      padding: var(--space-1) var(--space-2);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    /* Health Score Ring */
+    .health-ring {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto var(--space-4);
+      position: relative;
+    }
+
+    .health-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .health-ring-value {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .health-ring-label {
+      text-align: center;
+      font-size: 13px;
+      color: var(--fg-subtle);
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+      .dashboard-main { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .topbar { left: 0; }
+      .main-content { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 28 28" fill="none" width="28" height="28">
+        <circle cx="14" cy="14" r="12" stroke="url(#logo-grad)" stroke-width="2"/>
+        <circle cx="14" cy="14" r="4" fill="url(#logo-grad)"/>
+        <line x1="14" y1="2" x2="14" y2="10" stroke="url(#logo-grad)" stroke-width="1.5"/>
+        <line x1="14" y1="18" x2="14" y2="26" stroke="url(#logo-grad)" stroke-width="1.5"/>
+        <line x1="2" y1="14" x2="10" y2="14" stroke="url(#logo-grad)" stroke-width="1.5"/>
+        <line x1="18" y1="14" x2="26" y2="14" stroke="url(#logo-grad)" stroke-width="1.5"/>
+        <defs>
+          <linearGradient id="logo-grad" x1="0" y1="0" x2="28" y2="28">
+            <stop stop-color="oklch(65% 0.22 245)"/>
+            <stop offset="1" stop-color="oklch(60% 0.25 300)"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>CodeAtlas</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Overview</div>
+      <a href="dashboard.html" class="sidebar-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="analysis.html" class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Repository Analysis
+      </a>
+        <a href="insights.html" class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M20.66 8A10 10 0 0 0 14 2v6.66z" fill="currentColor" opacity="0.3"/></svg>
+        Engineering Insights
+      </a>
+      <a href="roadmap.html" class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        Modernization Roadmap
+      </a>
+
+      <div class="sidebar-section-label">Tools</div>
+      <a href="reports.html" class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Reports
+      </a>
+      <a href="demo.html" class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Demo Mode
+      </a>
+      <a href="settings.html" class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div style="padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border);">
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <div class="profile-avatar">CA</div>
+        <div>
+          <div style="font-size: 14px; font-weight: 500;">Demo Workspace</div>
+          <div style="font-size: 12px; color: var(--fg-subtle);">IBM Bob Hackathon</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="repo-switcher">
+        <svg class="repo-switcher-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+        <span class="repo-switcher-name">fastapi/full-stack-fastapi-template</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="repo-switcher-arrow"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="cmd-trigger" id="cmdTrigger">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Search or jump to...
+        <kbd>⌘K</kbd>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="notification-bell">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </div>
+      <div class="profile-avatar">CA</div>
+    </div>
+  </header>
+
+  <!-- Command Palette -->
+  <div class="command-palette" id="commandPalette">
+    <input type="text" class="command-palette-input" placeholder="Type a command or search..." id="cmdInput" autocomplete="off">
+    <div class="command-palette-results">
+      <div class="command-palette-item selected">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Go to Dashboard
+        <kbd>D</kbd>
+      </div>
+      <div class="command-palette-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83"/></svg>
+        Open Repository Analysis
+        <kbd>G</kbd>
+      </div>
+      <div class="command-palette-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
+        Open Engineering Insights
+        <kbd>I</kbd>
+      </div>
+      <div class="command-palette-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+        Generate Report
+        <kbd>R</kbd>
+      </div>
+      <div class="command-palette-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Launch Demo Mode
+        <kbd>M</kbd>
+      </div>
+      <div class="command-palette-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33"/></svg>
+        Open Settings
+        <kbd>S</kbd>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="main-content-inner">
+      <!-- Page Header -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-8);">
+        <div>
+          <h1 style="font-size: 28px; margin-bottom: var(--space-1);">Dashboard</h1>
+          <p style="font-size: 14px; margin: 0;">Architecture, risk, and modernization summary for fastapi/full-stack-fastapi-template.</p>
+        </div>
+        <div style="display: flex; gap: var(--space-3);">
+          <button class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+            Re-scan
+          </button>
+          <a href="reports.html" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </a>
+        </div>
+      </div>
+
+      <!-- Metric Cards -->
+      <div class="dashboard-grid">
+        <div class="card metric-card">
+          <div class="metric-card-header">
+            <span class="metric-card-label">Architecture Health</span>
+            <div class="metric-card-icon" style="background: rgba(255, 180, 50, 0.1); color: var(--warning);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+          </div>
+          <div class="metric-card-value" style="color: var(--warning);">35%</div>
+          <div class="metric-card-change negative">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
+            Weak assessment
+          </div>
+          <canvas class="metric-card-sparkline" id="sparkline1" width="400" height="40"></canvas>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-card-header">
+            <span class="metric-card-label">Technical Debt</span>
+            <div class="metric-card-icon" style="background: rgba(255, 180, 50, 0.1); color: var(--warning);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            </div>
+          </div>
+          <div class="metric-card-value" style="color: var(--warning);">$75K</div>
+          <div class="metric-card-change negative">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
+            141 files · 10,912 LOC
+          </div>
+          <canvas class="metric-card-sparkline" id="sparkline2" width="400" height="40"></canvas>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-card-header">
+            <span class="metric-card-label">Maintainability</span>
+            <div class="metric-card-icon" style="background: rgba(100, 140, 255, 0.1); color: var(--accent-blue);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </div>
+          </div>
+          <div class="metric-card-value" style="color: var(--fg);">79%</div>
+          <div class="metric-card-change positive">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+            2 languages detected
+          </div>
+          <canvas class="metric-card-sparkline" id="sparkline3" width="400" height="40"></canvas>
+        </div>
+
+        <div class="card metric-card">
+          <div class="metric-card-header">
+            <span class="metric-card-label">Critical Modules</span>
+            <div class="metric-card-icon" style="background: rgba(255, 70, 70, 0.1); color: var(--danger);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+          </div>
+          <div class="metric-card-value" style="color: var(--danger);">1</div>
+          <div class="metric-card-change negative">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
+            Appearance.tsx — 82% risk
+          </div>
+          <canvas class="metric-card-sparkline" id="sparkline4" width="400" height="40"></canvas>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="dashboard-main">
+        <div class="dashboard-left">
+          <!-- Architecture Health Chart -->
+      <div class="card chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Architecture Health Trend</span>
+              <div class="tabs">
+                <button class="tab active">7D</button>
+                <button class="tab">30D</button>
+                <button class="tab">90D</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="healthChart" width="800" height="200"></canvas>
+            </div>
+          </div>
+
+          <!-- Repository Activity -->
+          <div class="card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Recent Activity</span>
+              <button class="btn btn-ghost btn-sm">View all</button>
+            </div>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-dot success"></div>
+                <div>
+                  <div class="activity-text"><strong>GitHub repository imported</strong> — fastapi/full-stack-fastapi-template</div>
+                  <div class="activity-time">12 minutes ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot success"></div>
+                <div>
+                  <div class="activity-text"><strong>141 files analyzed</strong> across 2 languages · 10,912 LOC</div>
+                  <div class="activity-time">12 minutes ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot danger"></div>
+                <div>
+                  <div class="activity-text"><strong>Dependency confidence warning</strong> — only 3 edges resolved (1%)</div>
+                  <div class="activity-time">11 minutes ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot warning"></div>
+                <div>
+                  <div class="activity-text"><strong>Critical module detected</strong> — Appearance.tsx at 82% risk score</div>
+                  <div class="activity-time">10 minutes ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot info"></div>
+                <div>
+                  <div class="activity-text"><strong>Report exported</strong> — executive summary generated</div>
+                  <div class="activity-time">8 minutes ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-right">
+          <!-- Architecture Review -->
+          <div class="insight-card architecture-review">
+            <div class="architecture-review-header">
+              <div class="architecture-review-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--fg-muted)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div>
+                <div class="architecture-review-title">Architecture Review</div>
+                <div class="architecture-review-status"><span class="dot"></span> Report generated from latest scan</div>
+              </div>
+            </div>
+            <div class="architecture-review-content">
+              <p style="margin-bottom: var(--space-3);">The <strong>frontend/src/components/Common/Appearance.tsx</strong> module is the highest-risk component with an <strong>82% risk score</strong> and <strong>0.11 centrality</strong>. It appears to couple visual state with application behavior.</p>
+              <p style="margin-bottom: var(--space-3);">Dependency confidence is <strong>1%</strong> — only 3 edges were resolved across 141 files. Some imports may be unresolved due to framework aliases, dynamic imports, or convention-based routing.</p>
+              <p style="margin: 0;">Three additional high-risk modules were identified: <strong>AppSidebar.tsx</strong> (60%), <strong>sidebar.tsx</strong> (73%), and <strong>test_users.py</strong> (66%).</p>
+            </div>
+          </div>
+
+          <!-- Risk Distribution -->
+          <div class="card risk-distribution">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Risk Distribution</span>
+            </div>
+            <div class="risk-bar">
+              <div class="risk-segment" style="width: 1%; background: var(--danger);"></div>
+              <div class="risk-segment" style="width: 2%; background: var(--warning);"></div>
+              <div class="risk-segment" style="width: 4%; background: var(--info);"></div>
+              <div class="risk-segment" style="width: 93%; background: var(--success);"></div>
+            </div>
+            <div class="risk-legend">
+              <div class="risk-legend-item"><div class="risk-legend-dot" style="background: var(--danger);"></div> Critical (1)</div>
+              <div class="risk-legend-item"><div class="risk-legend-dot" style="background: var(--warning);"></div> High (3)</div>
+              <div class="risk-legend-item"><div class="risk-legend-dot" style="background: var(--info);"></div> Medium (5)</div>
+              <div class="risk-legend-item"><div class="risk-legend-dot" style="background: var(--success);"></div> Low (132)</div>
+            </div>
+          </div>
+
+          <!-- Blast Radius Preview -->
+          <div class="card blast-preview">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Blast Radius Preview</span>
+              <span class="badge badge-danger">Critical</span>
+            </div>
+            <canvas class="blast-preview-canvas" id="blastPreviewCanvas"></canvas>
+          </div>
+
+          <!-- Dependency Confidence -->
+          <div class="card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Dependency Confidence</span>
+            </div>
+            <div class="confidence-grid">
+              <div class="confidence-item">
+                <div class="confidence-label">Import Resolution</div>
+                <div class="confidence-value" style="color: var(--danger);">1%</div>
+              </div>
+              <div class="confidence-item">
+                <div class="confidence-label">Resolved Edges</div>
+                <div class="confidence-value" style="color: var(--danger);">3</div>
+              </div>
+              <div class="confidence-item">
+                <div class="confidence-label">Total Nodes</div>
+                <div class="confidence-value" style="color: var(--fg);">141</div>
+              </div>
+              <div class="confidence-item">
+                <div class="confidence-label">Note</div>
+                <div class="confidence-value" style="font-size: 11px; color: var(--fg-subtle); font-weight: 400; font-variant-numeric: normal;">Aliases & dynamic imports unresolved</div>
+              </div>
+            </div>
+            <div class="confidence-warning" style="margin-top: var(--space-4);">
+              Low dependency confidence: only 3 resolved edges were detected. Some imports may be unresolved due to aliases, dynamic imports, or framework conventions.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="static/js/api.js?v=2"></script>
+  <script src="static/js/state.js?v=2"></script>
+  <script src="static/js/repo-switcher.js?v=2"></script>
+  <script src="static/js/dashboard.js?v=2"></script>
+  <script>
+    const cmdTrigger = document.getElementById('cmdTrigger');
+    const commandPalette = document.getElementById('commandPalette');
+    const cmdInput = document.getElementById('cmdInput');
+
+    // Command palette navigation
+    document.querySelectorAll('.command-palette-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const text = item.textContent.trim().toLowerCase();
+        const routes = {
+          'go to dashboard': 'dashboard.html',
+          'open repository analysis': 'analysis.html',
+          'open engineering insights': 'insights.html',
+          'generate report': 'reports.html',
+          'launch demo mode': 'demo.html',
+          'open settings': 'settings.html',
+        };
+        for (const [key, route] of Object.entries(routes)) {
+          if (text.includes(key)) {
+            window.location.href = route;
+            return;
+          }
+        }
+      });
+      item.addEventListener('mouseenter', () => {
+        document.querySelectorAll('.command-palette-item').forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+      });
+    });
+
+    cmdInput.addEventListener('input', () => {
+      const query = cmdInput.value.toLowerCase();
+      document.querySelectorAll('.command-palette-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query) ? 'flex' : 'none';
+      });
+    });
+
+    cmdInput.addEventListener('keydown', (e) => {
+      const items = [...document.querySelectorAll('.command-palette-item')].filter(i => i.style.display !== 'none');
+      const current = items.findIndex(i => i.classList.contains('selected'));
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        items.forEach(i => i.classList.remove('selected'));
+        items[(current + 1) % items.length]?.classList.add('selected');
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        items.forEach(i => i.classList.remove('selected'));
+        items[(current - 1 + items.length) % items.length]?.classList.add('selected');
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const selected = document.querySelector('.command-palette-item.selected');
+        if (selected) selected.click();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        commandPalette.classList.toggle('open');
+        if (commandPalette.classList.contains('open')) cmdInput.focus();
+      }
+      if (e.key === 'Escape') {
+        commandPalette.classList.remove('open');
+      }
+    });
+
+    // Sparklines
+    function drawSparkline(canvasId, data, color) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight || 40;
+      canvas.width = w * 2;
+      canvas.height = h * 2;
+      ctx.scale(2, 2);
+
+      const max = Math.max(...data);
+      const min = Math.min(...data);
+      const range = max - min || 1;
+
+      ctx.beginPath();
+      data.forEach((v, i) => {
+        const x = (i / (data.length - 1)) * w;
+        const y = h - ((v - min) / range) * (h - 4) - 2;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      const gradient = ctx.createLinearGradient(0, 0, 0, h);
+      gradient.addColorStop(0, color.replace(')', ', 0.2)').replace('rgb', 'rgba'));
+      gradient.addColorStop(1, 'transparent');
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    }
+
+    // Health Chart
+    const healthCanvas = document.getElementById('healthChart');
+    const healthCtx = healthCanvas ? healthCanvas.getContext('2d') : null;
+
+    function drawHealthChart() {
+      if (!healthCanvas || !healthCtx) return;
+      const w = healthCanvas.offsetWidth;
+      const h = healthCanvas.offsetHeight;
+      if (!w || !h) return;
+      healthCanvas.width = w * 2;
+      healthCanvas.height = h * 2;
+      healthCtx.scale(2, 2);
+
+      const padding = { top: 20, right: 20, bottom: 30, left: 40 };
+      const chartW = w - padding.left - padding.right;
+      const chartH = h - padding.top - padding.bottom;
+
+      const data = [38, 37, 36, 36, 35, 35, 35, 35, 35, 35, 35, 35];
+      const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const max = 100;
+      const min = 0;
+
+      for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (chartH / 5) * i;
+        healthCtx.beginPath();
+        healthCtx.moveTo(padding.left, y);
+        healthCtx.lineTo(w - padding.right, y);
+        healthCtx.strokeStyle = 'rgba(100, 120, 200, 0.08)';
+        healthCtx.lineWidth = 1;
+        healthCtx.stroke();
+        healthCtx.fillStyle = 'rgba(240, 242, 255, 0.4)';
+        healthCtx.font = '11px Inter, sans-serif';
+        healthCtx.textAlign = 'right';
+        healthCtx.fillText((max - (max / 5) * i).toFixed(0) + '%', padding.left - 8, y + 4);
+      }
+
+      healthCtx.beginPath();
+      data.forEach((v, i) => {
+        const x = padding.left + (i / (data.length - 1)) * chartW;
+        const y = padding.top + chartH - ((v - min) / (max - min)) * chartH;
+        if (i === 0) healthCtx.moveTo(x, y);
+        else healthCtx.lineTo(x, y);
+      });
+      healthCtx.strokeStyle = 'oklch(65% 0.22 245)';
+      healthCtx.lineWidth = 2;
+      healthCtx.stroke();
+
+      healthCtx.lineTo(padding.left + chartW, padding.top + chartH);
+      healthCtx.lineTo(padding.left, padding.top + chartH);
+      healthCtx.closePath();
+      const gradient = healthCtx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+      gradient.addColorStop(0, 'rgba(100, 140, 255, 0.15)');
+      gradient.addColorStop(1, 'transparent');
+      healthCtx.fillStyle = gradient;
+      healthCtx.fill();
+
+      data.forEach((v, i) => {
+        const x = padding.left + (i / (data.length - 1)) * chartW;
+        const y = padding.top + chartH - ((v - min) / (max - min)) * chartH;
+        healthCtx.beginPath();
+        healthCtx.arc(x, y, 3, 0, Math.PI * 2);
+        healthCtx.fillStyle = 'oklch(65% 0.22 245)';
+        healthCtx.fill();
+      });
+
+      labels.forEach((label, i) => {
+        const x = padding.left + (i / (labels.length - 1)) * chartW;
+        healthCtx.fillStyle = 'rgba(240, 242, 255, 0.4)';
+        healthCtx.font = '11px Inter, sans-serif';
+        healthCtx.textAlign = 'center';
+        healthCtx.fillText(label, x, h - 8);
+      });
+    }
+
+    // Blast Preview Canvas
+    const blastPreviewCanvas = document.getElementById('blastPreviewCanvas');
+    const blastPreviewCtx = blastPreviewCanvas ? blastPreviewCanvas.getContext('2d') : null;
+
+    function resizeBlastPreview() {
+      if (!blastPreviewCanvas || !blastPreviewCtx) return;
+      const w = blastPreviewCanvas.offsetWidth;
+      const h = blastPreviewCanvas.offsetHeight || 400;
+      if (!w) return;
+      blastPreviewCtx.setTransform(1, 0, 0, 1, 0, 0);
+      blastPreviewCanvas.width = w * 2;
+      blastPreviewCanvas.height = h * 2;
+      blastPreviewCtx.scale(2, 2);
+    }
+
+    let bpNodes = [];
+    let bpEdges = [];
+    let bpCenter = null;
+    let bpTime = 0;
+
+    function buildBlastData() {
+      const graph = AppState.get('graph');
+      const scanResult = AppState.get('scanResult');
+
+      if (!graph || !graph.nodes || graph.nodes.length === 0) {
+        // Fallback: show empty state with message
+        bpNodes = [];
+        bpEdges = [];
+        bpCenter = null;
+        return;
+      }
+
+      // Find highest-risk node as center
+      const sorted = [...graph.nodes].sort((a, b) => {
+        const ra = a.risk_score || 0;
+        const rb = b.risk_score || 0;
+        return rb - ra;
+      });
+
+      const center = sorted[0];
+      const centerRisk = center.risk_score || 0;
+      const riskNorm = centerRisk > 1 ? centerRisk / 100 : centerRisk;
+
+      bpCenter = {
+        label: (center.path || center.label || 'unknown').split('/').pop(),
+        risk: Math.round(centerRisk > 1 ? centerRisk : centerRisk * 100),
+        inDegree: center.in_degree || 0,
+        centrality: center.centrality || 0,
+      };
+
+      // Find connected nodes (edges where center is source or target)
+      const connectedIds = new Set();
+      const edges = graph.edges || [];
+      const centerId = center.id || center.path || center.label;
+
+      edges.forEach(e => {
+        const src = e.source || e.from || '';
+        const tgt = e.target || e.to || '';
+        if (src === centerId || src === center.path) connectedIds.add(tgt);
+        if (tgt === centerId || tgt === center.path) connectedIds.add(src);
+      });
+
+      // Build connected node data
+      const connected = [];
+      graph.nodes.forEach(n => {
+        const nid = n.id || n.path || n.label;
+        if (connectedIds.has(nid) || connectedIds.has(n.path)) {
+          const nr = n.risk_score || 0;
+          connected.push({
+            label: (n.path || n.label || 'unknown').split('/').pop(),
+            risk: Math.round(nr > 1 ? nr : nr * 100),
+            inDegree: n.in_degree || 0,
+          });
+        }
+      });
+
+      // Sort by risk, take top 7
+      connected.sort((a, b) => b.risk - a.risk);
+      const topConnected = connected.slice(0, 7);
+
+      // Position nodes in radial layout
+      bpNodes = [{
+        x: 0.5, y: 0.5, r: Math.max(8, Math.min(16, 6 + riskNorm * 14)),
+        label: bpCenter.label, risk: bpCenter.risk, isCenter: true,
+      }];
+
+      topConnected.forEach((n, i) => {
+        const angle = (i / topConnected.length) * Math.PI * 2 - Math.PI / 2;
+        const dist = 0.45 + (n.risk / 100) * 0.05;
+        const nr = n.risk > 1 ? n.risk / 100 : n.risk;
+        bpNodes.push({
+          x: 0.5 + Math.cos(angle) * dist,
+          y: 0.5 + Math.sin(angle) * dist,
+          r: Math.max(4, Math.min(10, 4 + nr * 8)),
+          label: n.label,
+          risk: n.risk,
+          isCenter: false,
+        });
+        bpEdges.push([0, i + 1]);
+      });
+    }
+
+    function getRiskColor(risk) {
+      if (risk >= 80) return 'rgba(255, 70, 70, 0.8)';
+      if (risk >= 50) return 'rgba(255, 180, 50, 0.7)';
+      if (risk >= 30) return 'rgba(100, 140, 255, 0.6)';
+      return 'rgba(80, 200, 120, 0.5)';
+    }
+
+    function animateBlastPreview() {
+      if (!blastPreviewCanvas || !blastPreviewCtx) return;
+      const w = blastPreviewCanvas.offsetWidth;
+      const h = blastPreviewCanvas.offsetHeight;
+      if (!w || !h) return;
+      blastPreviewCtx.clearRect(0, 0, w, h);
+      bpTime += 0.008;
+
+      if (bpNodes.length === 0) {
+        // Empty state
+        blastPreviewCtx.fillStyle = 'rgba(240, 242, 255, 0.3)';
+        blastPreviewCtx.font = '13px Inter, sans-serif';
+        blastPreviewCtx.textAlign = 'center';
+        blastPreviewCtx.fillText('Run a scan to see blast radius', w / 2, h / 2 - 8);
+        blastPreviewCtx.font = '11px Inter, sans-serif';
+        blastPreviewCtx.fillStyle = 'rgba(240, 242, 255, 0.2)';
+        blastPreviewCtx.fillText('Impact analysis of highest-risk module', w / 2, h / 2 + 10);
+        requestAnimationFrame(animateBlastPreview);
+        return;
+      }
+
+      const center = bpNodes[0];
+      const ringCount = Math.min(3, Math.ceil(center.risk / 30));
+      const baseRadius = 0.12;
+
+      for (let i = 0; i < ringCount; i++) {
+        const pulse = Math.sin(bpTime * 2 + i) * 0.008 + 1;
+        const ringR = (baseRadius + i * 0.12) * Math.min(w, h) * pulse;
+        const alpha = 0.15 - i * 0.04;
+        blastPreviewCtx.beginPath();
+        blastPreviewCtx.arc(w * center.x, h * center.y, ringR, 0, Math.PI * 2);
+        blastPreviewCtx.strokeStyle = `rgba(255, 70, 70, ${alpha})`;
+        blastPreviewCtx.lineWidth = 1;
+        blastPreviewCtx.stroke();
+      }
+
+      // Draw edges
+      bpEdges.forEach(([a, b]) => {
+        const na = bpNodes[a];
+        const nb = bpNodes[b];
+        if (!na || !nb) return;
+        blastPreviewCtx.beginPath();
+        blastPreviewCtx.moveTo(w * na.x, h * na.y);
+        blastPreviewCtx.lineTo(w * nb.x, h * nb.y);
+        blastPreviewCtx.strokeStyle = 'rgba(100, 140, 255, 0.12)';
+        blastPreviewCtx.lineWidth = 1;
+        blastPreviewCtx.stroke();
+
+        // Animated particle
+        const t = (bpTime * 0.3 + a * 0.15) % 1;
+        const dx = w * na.x + (w * nb.x - w * na.x) * t;
+        const dy = h * na.y + (h * nb.y - h * na.y) * t;
+        blastPreviewCtx.beginPath();
+        blastPreviewCtx.arc(dx, dy, 1.5, 0, Math.PI * 2);
+        blastPreviewCtx.fillStyle = 'rgba(100, 140, 255, 0.5)';
+        blastPreviewCtx.fill();
+      });
+
+      // Draw nodes
+      bpNodes.forEach(n => {
+        const x = n.x * w;
+        const y = n.y * h;
+        const pulse = Math.sin(bpTime * 1.5 + (n.isCenter ? 0 : n.x * 10)) * 0.06 + 1;
+        const r = n.r * pulse;
+
+        // Glow for center
+        if (n.isCenter) {
+          blastPreviewCtx.beginPath();
+          blastPreviewCtx.arc(x, y, r * 2.2, 0, Math.PI * 2);
+          blastPreviewCtx.fillStyle = 'rgba(255, 70, 70, 0.06)';
+          blastPreviewCtx.fill();
+        }
+
+        blastPreviewCtx.beginPath();
+        blastPreviewCtx.arc(x, y, r, 0, Math.PI * 2);
+        blastPreviewCtx.fillStyle = 'rgba(20, 22, 40, 0.9)';
+        blastPreviewCtx.fill();
+        blastPreviewCtx.strokeStyle = getRiskColor(n.risk);
+        blastPreviewCtx.lineWidth = n.isCenter ? 2.5 : 1.5;
+        blastPreviewCtx.stroke();
+
+        // Label
+        blastPreviewCtx.fillStyle = 'rgba(220, 222, 240, 0.75)';
+        blastPreviewCtx.font = `${n.isCenter ? '600' : '400'} ${n.isCenter ? 10 : 9}px Inter, sans-serif`;
+        blastPreviewCtx.textAlign = 'center';
+        blastPreviewCtx.textBaseline = 'middle';
+        blastPreviewCtx.fillText(n.label, x, y);
+      });
+
+      // Badge
+      if (bpCenter) {
+        blastPreviewCtx.fillStyle = 'rgba(255, 70, 70, 0.85)';
+        blastPreviewCtx.font = '600 9px Inter, sans-serif';
+        blastPreviewCtx.textAlign = 'center';
+        blastPreviewCtx.fillText(`${bpCenter.risk}% risk · ${bpCenter.inDegree} dependencies`, w / 2, h - 10);
+      }
+
+      requestAnimationFrame(animateBlastPreview);
+    }
+
+    // Init all charts after layout
+    requestAnimationFrame(() => {
+      resizeBlastPreview();
+      drawSparkline('sparkline1', [42, 40, 38, 37, 36, 35, 35, 35], 'rgb(255, 180, 50)');
+      drawSparkline('sparkline2', [68, 70, 71, 72, 73, 74, 75, 75], 'rgb(255, 180, 50)');
+      drawSparkline('sparkline3', [72, 74, 75, 76, 77, 78, 79, 79], 'rgb(100, 140, 255)');
+      drawSparkline('sparkline4', [2, 2, 1, 1, 1, 1, 1, 1], 'rgb(255, 70, 70)');
+      drawHealthChart();
+      buildBlastData();
+      animateBlastPreview();
+    });
+
+    // Rebuild blast data when new scan completes
+    window.addEventListener('graph-data-changed', () => {
+      buildBlastData();
+    });
+
+    window.addEventListener('resize', () => {
+      drawHealthChart();
+      resizeBlastPreview();
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tabs').forEach(tabGroup => {
+      tabGroup.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabGroup.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+        });
+      });
+    });
+
+    // View all activity button - navigate to insights for full activity log
+    document.querySelector('.btn-ghost.btn-sm')?.addEventListener('click', () => {
+      window.location.href = 'insights.html';
+    });
+  </script>
+</body>
+</html>

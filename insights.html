@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Intelligence — CodeAtlas</title>
+  <link rel="stylesheet" href="design-system.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    .insights-layout { display: grid; grid-template-columns: 1fr 340px; gap: var(--space-6); }
+    .insights-main { display: flex; flex-direction: column; gap: var(--space-6); }
+    .insights-sidebar { display: flex; flex-direction: column; gap: var(--space-6); }
+
+    .insight-card { padding: var(--space-6); }
+    .insight-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    .insight-card-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: var(--space-2); }
+
+    .insight-body { font-size: 14px; line-height: 1.7; color: var(--fg-muted); }
+    .insight-body strong { color: var(--fg); }
+
+    .insight-tags { display: flex; gap: var(--space-2); margin-top: var(--space-4); flex-wrap: wrap; }
+    .insight-tag { padding: var(--space-1) var(--space-3); font-size: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-full); color: var(--fg-muted); }
+
+    .insight-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-top: var(--space-4); }
+    .insight-metric { text-align: center; padding: var(--space-3); background: var(--bg); border-radius: var(--radius-md); }
+    .insight-metric-value { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .insight-metric-label { font-size: 12px; color: var(--fg-subtle); margin-top: var(--space-1); }
+
+    .roadmap-list { display: flex; flex-direction: column; gap: var(--space-4); }
+    .roadmap-item { padding: var(--space-4); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); border-left: 3px solid var(--accent-blue); }
+    .roadmap-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
+    .roadmap-phase { font-size: 12px; font-weight: 600; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.05em; }
+    .roadmap-item h4 { font-size: 15px; margin-bottom: var(--space-2); }
+    .roadmap-item p { font-size: 13px; margin: 0; }
+    .roadmap-effort { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); font-size: 12px; color: var(--fg-subtle); }
+
+    .debt-chart { height: 160px; margin-top: var(--space-4); }
+
+    .generated-doc { padding: var(--space-6); }
+    .doc-preview { background: var(--bg-deep); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-6); font-size: 14px; line-height: 1.8; }
+    .doc-preview h3 { color: var(--fg); margin-bottom: var(--space-3); }
+    .doc-preview p { color: var(--fg-muted); margin-bottom: var(--space-3); }
+    .doc-preview code { font-family: var(--font-mono); background: var(--bg-elevated); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: 13px; color: var(--accent-blue); }
+
+    @media (max-width: 1200px) { .insights-layout { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 28 28" fill="none" width="28" height="28"><circle cx="14" cy="14" r="12" stroke="url(#lg)" stroke-width="2"/><circle cx="14" cy="14" r="4" fill="url(#lg)"/><line x1="14" y1="2" x2="14" y2="10" stroke="url(#lg)" stroke-width="1.5"/><line x1="14" y1="18" x2="14" y2="26" stroke="url(#lg)" stroke-width="1.5"/><line x1="2" y1="14" x2="10" y2="14" stroke="url(#lg)" stroke-width="1.5"/><line x1="18" y1="14" x2="26" y2="14" stroke="url(#lg)" stroke-width="1.5"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="oklch(65% 0.22 245)"/><stop offset="1" stop-color="oklch(60% 0.25 300)"/></linearGradient></defs></svg>
+      <span>CodeAtlas</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Overview</div>
+      <a href="dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a href="analysis.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83"/></svg>Repository Analysis</a>
+      <a href="insights.html" class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>Engineering Intelligence</a>
+      <a href="roadmap.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>Modernization Roadmap</a>
+      <div class="sidebar-section-label">Tools</div>
+      <a href="reports.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Reports</a>
+      <a href="demo.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Demo Mode</a>
+      <a href="settings.html" class="sidebar-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33"/></svg>Settings</a>
+    </nav>
+    <div style="padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border);"><div style="display: flex; align-items: center; gap: var(--space-3);"><div class="profile-avatar">CA</div><div><div style="font-size: 14px; font-weight: 500;">Demo Workspace</div><div style="font-size: 12px; color: var(--fg-subtle);">IBM Bob Hackathon</div></div></div></div>
+  </aside>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="repo-switcher"><svg class="repo-switcher-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg><span class="repo-switcher-name">fastapi/full-stack-fastapi-template</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="repo-switcher-arrow"><polyline points="6 9 12 15 18 9"/></svg></div>
+    </div>
+    <div class="topbar-right"><div class="notification-bell"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="profile-avatar">CA</div></div>
+  </header>
+
+  <main class="main-content">
+    <div class="main-content-inner">
+      <div style="margin-bottom: var(--space-8);">
+        <h1 style="font-size: 28px; margin-bottom: var(--space-1);">Engineering Intelligence</h1>
+        <p style="font-size: 14px; margin: 0;">Architecture assessment, risk findings, and modernization opportunities</p>
+      </div>
+
+      <div class="insights-layout">
+        <div class="insights-main">
+          <!-- Architecture Summary -->
+          <div class="ai-card insight-card">
+            <div class="insight-card-header">
+              <div class="insight-card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
+                Architecture Summary
+              </div>
+              <span class="badge badge-info">12 recommendations</span>
+            </div>
+            <div class="insight-body">
+              <p>The repository follows a <strong>Next.js + FastAPI full-stack pattern</strong> with a separation between frontend (TypeScript/React) and backend (Python/FastAPI). The analysis covers <strong>141 files</strong> across 2 languages totaling <strong>10,912 LOC</strong>.</p>
+              <p style="margin-top: var(--space-3);">The <strong>Appearance.tsx</strong> component is the highest-risk module — it appears to couple visual state with application behavior and shared layout concerns, with an 82% risk score and 0.11 centrality.</p>
+              <p style="margin-top: var(--space-3);"><strong>Dependency confidence is low (1%)</strong> — only 3 edges were resolved. Framework aliases, dynamic imports, and convention-based routing prevent full static analysis.</p>
+            </div>
+            <div class="confidence-warning" style="margin-top: var(--space-4); margin-bottom: 0;">
+              Dependency confidence is low because framework aliases and dynamic imports limit static dependency resolution.
+            </div>
+            <div class="insight-metrics">
+              <div class="insight-metric"><div class="insight-metric-value" style="color: var(--success);">141</div><div class="insight-metric-label">Files</div></div>
+              <div class="insight-metric"><div class="insight-metric-value" style="color: var(--warning);">35%</div><div class="insight-metric-label">Arch. Health</div></div>
+              <div class="insight-metric"><div class="insight-metric-value" style="color: var(--accent-blue);">62%</div><div class="insight-metric-label">Mod. Readiness</div></div>
+            </div>
+          </div>
+
+          <!-- AI Recommendations -->
+          <div class="card insight-card">
+            <div class="insight-card-header">
+              <div class="insight-card-title">Engineering Findings</div>
+              <div class="tabs"><button class="tab active">All</button><button class="tab">Critical</button><button class="tab">Performance</button></div>
+            </div>
+            <div class="roadmap-list">
+              <div class="roadmap-item" style="border-left-color: var(--danger);">
+                <div class="roadmap-item-header"><span class="roadmap-phase" style="color: var(--danger);">Critical</span><span class="badge badge-danger">82% Risk</span></div>
+                <h4>Separate presentation concerns from shared application state</h4>
+                <p>The <code>Appearance.tsx</code> component couples UI presentation with application behavior. Move shared state handling outside the component boundary to reduce the 0.11 centrality score.</p>
+                <div class="roadmap-effort"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>1 week · 98 LOC</div>
+              </div>
+              <div class="roadmap-item" style="border-left-color: var(--warning);">
+                <div class="roadmap-item-header"><span class="roadmap-phase" style="color: var(--warning);">High</span><span class="badge badge-warning">73% Risk</span></div>
+                <h4>Isolate sidebar.tsx UI Primitive</h4>
+                <p>The shared sidebar component is used across multiple features. Changes propagate widely. Add comprehensive tests before any refactoring.</p>
+                <div class="roadmap-effort"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>3 days · 230 LOC</div>
+              </div>
+              <div class="roadmap-item" style="border-left-color: var(--info);">
+                <div class="roadmap-item-header"><span class="roadmap-phase" style="color: var(--info);">Medium</span><span class="badge badge-info">Low resolution</span></div>
+                <h4>Improve Dependency Resolution</h4>
+                <p>Only 1% of dependencies were resolved. Configure path aliases and static import patterns to improve analysis accuracy.</p>
+                <div class="roadmap-effort"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Estimated effort: 1–2 days</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technical Debt Analysis -->
+          <div class="card insight-card">
+            <div class="insight-card-header">
+              <div class="insight-card-title">Risk Concentration Trend</div>
+            </div>
+            <div class="insight-body">
+              <p>Technical debt appears concentrated in a small number of shared UI and infrastructure modules. Risk distribution suggests a small set of files carry disproportionate coupling weight.</p>
+            </div>
+            <canvas class="debt-chart" id="debtChart"></canvas>
+          </div>
+
+          <!-- Generated Docs -->
+          <div class="card generated-doc">
+            <div class="insight-card-header">
+              <div class="insight-card-title">Generated Engineering Notes</div>
+              <button class="btn btn-secondary btn-sm">Export</button>
+            </div>
+            <div class="doc-preview">
+              <h3>Module: Appearance.tsx</h3>
+              <p><strong>Path:</strong> <code>frontend/src/components/Common/Appearance.tsx</code></p>
+              <p><strong>Responsibilities:</strong> Manages visual theme state and layout appearance settings shared across multiple dashboard components.</p>
+              <p><strong>Dependencies:</strong> <code>sidebar.tsx</code> (layout primitive), <code>AppSidebar.tsx</code> (sidebar wrapper), theme configuration.</p>
+              <p><strong>Dependents:</strong> Dashboard layout, settings panel, and 3 additional components that reference appearance state.</p>
+              <p><strong>Risk Assessment:</strong> High — shared dependency point with 82% risk score and 0.11 centrality. Changes to this module affect multiple downstream consumers.</p>
+              <p><strong>Confidence Note:</strong> Some import relationships inferred from static analysis only. Dynamic theme switching may introduce additional runtime coupling.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="insights-sidebar">
+          <!-- Architecture Queries -->
+          <div class="card">
+            <div class="insight-card-header">
+              <div class="insight-card-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Architecture Queries
+              </div>
+            </div>
+            <div style="display: flex; gap: var(--space-2);">
+              <input type="text" class="input" placeholder="Search architectural findings or file relationships…" style="flex: 1;">
+              <button class="btn btn-primary btn-sm">Search</button>
+            </div>
+            <div style="margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3);">
+              <div style="font-size: 12px; color: var(--fg-subtle);">Suggested queries:</div>
+              <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                <span class="insight-tag" style="cursor: pointer; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);">Which files have the highest risk scores?</span>
+                <span class="insight-tag" style="cursor: pointer; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);">Which modules have unresolved imports?</span>
+                <span class="insight-tag" style="cursor: pointer; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);">Which components affect the sidebar layout?</span>
+                <span class="insight-tag" style="cursor: pointer; padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);">Which files should be tested before refactoring?</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dependency Health -->
+          <div class="card">
+            <div class="insight-card-header"><div class="insight-card-title">Dependency Health</div></div>
+            <div class="metric-rows">
+              <div class="metric-row"><span class="metric-row-label">Total Files</span><span class="metric-row-value">141</span></div>
+              <div class="metric-row"><span class="metric-row-label">Resolved Edges</span><span class="metric-row-value" style="color: var(--danger);">3</span></div>
+              <div class="metric-row"><span class="metric-row-label">Dependency Confidence</span><span class="metric-row-value" style="color: var(--danger);">1%</span></div>
+              <div class="metric-row"><span class="metric-row-label">Note</span><span class="metric-row-value" style="font-size: 11px; color: var(--fg-subtle); font-weight: 400;">Aliases & dynamic imports unresolved</span></div>
+            </div>
+            <div class="engineering-note" style="margin-top: var(--space-4);">
+              This graph reflects statically discoverable imports only.
+            </div>
+          </div>
+
+          <!-- Suggested Onboarding Path -->
+          <div class="card">
+            <div class="insight-card-header"><div class="insight-card-title">Suggested Onboarding Path</div></div>
+            <div class="insight-body">
+              <p>The following modules appear most important for understanding repository structure:</p>
+              <div style="margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2);">
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2); background: var(--bg); border-radius: var(--radius-sm);"><span style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--accent-blue); color: white; border-radius: 50%; font-size: 12px; font-weight: 600;">1</span><span style="font-size: 13px;">Entry point → <code>main.py</code></span></div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2); background: var(--bg); border-radius: var(--radius-sm);"><span style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--accent-blue); color: white; border-radius: 50%; font-size: 12px; font-weight: 600;">2</span><span style="font-size: 13px;">API routes → <code>api.py</code>, <code>users.py</code></span></div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2); background: var(--bg); border-radius: var(--radius-sm);"><span style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--accent-blue); color: white; border-radius: 50%; font-size: 12px; font-weight: 600;">3</span><span style="font-size: 13px;">Frontend layout → <code>Appearance.tsx</code></span></div>
+                <div style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2); background: var(--bg); border-radius: var(--radius-sm);"><span style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--accent-blue); color: white; border-radius: 50%; font-size: 12px; font-weight: 600;">4</span><span style="font-size: 13px;">Sidebar primitive → <code>sidebar.tsx</code></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Debt Chart
+    const debtCanvas = document.getElementById('debtChart');
+    const debtCtx = debtCanvas.getContext('2d');
+
+    function drawDebtChart() {
+      debtCanvas.width = debtCanvas.offsetWidth * 2;
+      debtCanvas.height = debtCanvas.offsetHeight * 2;
+      debtCtx.scale(2, 2);
+      const w = debtCanvas.offsetWidth;
+      const h = debtCanvas.offsetHeight;
+      const padding = { top: 10, right: 10, bottom: 25, left: 40 };
+      const chartW = w - padding.left - padding.right;
+      const chartH = h - padding.top - padding.bottom;
+
+      const data = [12, 18, 15, 22, 20, 25, 23.8];
+      const labels = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7'];
+
+      for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartH / 4) * i;
+        debtCtx.beginPath();
+        debtCtx.moveTo(padding.left, y);
+        debtCtx.lineTo(w - padding.right, y);
+        debtCtx.strokeStyle = 'rgba(100, 120, 200, 0.08)';
+        debtCtx.stroke();
+        debtCtx.fillStyle = 'rgba(240, 242, 255, 0.4)';
+        debtCtx.font = '11px Inter';
+        debtCtx.textAlign = 'right';
+        debtCtx.fillText((30 - 7.5 * i).toFixed(0) + '%', padding.left - 6, y + 4);
+      }
+
+      debtCtx.beginPath();
+      data.forEach((v, i) => {
+        const x = padding.left + (i / (data.length - 1)) * chartW;
+        const y = padding.top + chartH - (v / 30) * chartH;
+        if (i === 0) debtCtx.moveTo(x, y);
+        else debtCtx.lineTo(x, y);
+      });
+      debtCtx.strokeStyle = 'oklch(75% 0.16 85)';
+      debtCtx.lineWidth = 2;
+      debtCtx.stroke();
+
+      debtCtx.lineTo(padding.left + chartW, padding.top + chartH);
+      debtCtx.lineTo(padding.left, padding.top + chartH);
+      debtCtx.closePath();
+      const g = debtCtx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+      g.addColorStop(0, 'rgba(255, 180, 50, 0.15)');
+      g.addColorStop(1, 'transparent');
+      debtCtx.fillStyle = g;
+      debtCtx.fill();
+
+      labels.forEach((l, i) => {
+        const x = padding.left + (i / (labels.length - 1)) * chartW;
+        debtCtx.fillStyle = 'rgba(240, 242, 255, 0.4)';
+        debtCtx.font = '11px Inter';
+        debtCtx.textAlign = 'center';
+        debtCtx.fillText(l, x, h - 5);
+      });
+    }
+    drawDebtChart();
+    window.addEventListener('resize', drawDebtChart);
+
+    document.querySelectorAll('.tabs').forEach(tg => {
+      tg.querySelectorAll('.tab').forEach(t => { t.addEventListener('click', () => { tg.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); t.classList.add('active'); }); });
+    });
+  </script>
+</body>
+</html>
