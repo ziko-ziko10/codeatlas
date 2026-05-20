@@ -167,7 +167,6 @@ Built for the **IBM Bob AI Hackathon 2026**.
 
 - **Team**: ziko-ziko10
 - **AI Provider**: IBM watsonx.ai (Granite models)
-- **Theme**: AI-powered software engineering intelligence
 
 ---
 
